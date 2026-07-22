@@ -1,4 +1,30 @@
-# 📐 منصة مِعْيار - صانع موجز الهوية البصرية الذكي (Meyar Brief Generator)
+
+# Dockerfile for Meyar Brief Generator
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY --from=builder /app/dist ./dist
+
+EXPOSE 3000
+
+CMD ["node", "dist/server.cjs"]# 📐 منصة مِعْيار - صانع موجز الهوية البصرية الذكي (Meyar Brief Generator)
 
 [![Node.js Version](https://img.shields.io/badge/Node.js-18%2B-brightgreen.svg)](https://nodejs.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
